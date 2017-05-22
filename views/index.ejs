@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang='en'>
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+</head>
+
+<body>
+
+    <div class='container'>
+        <div class='col-md-2'></div>
+        <div class='col-md-1'>
+            <!--<div class='row'>
+                <div class='btn btn-default'>Room 0</div>
+            </div>-->
+            <div class='row'>
+                <div class='btn btn-success'>Room 1</div>
+            </div>
+        </div>
+        <div class='col-md-6'>
+            <div class='row'>
+                <input id='name' class="form-control" type="text" name="name" value="name" readonly>
+            </div>
+            <div class='row'>
+                <div id='content' class='form-control' style="height: 500px; overflow-y: scroll;">
+                </div>
+            </div>
+            <div class='row'>
+                <textarea id='textarea' class="form-control" placeholder="Type your mess"></textarea>
+            </div>
+        </div>
+        <div class='col-md-3'>
+            <h3>Online</h3>
+            <div class="list-group" id='onlineUsers'>
+                
+                <!--<a class="list-group-item" href="#"><i class="fa fa-circle" style="color:green" aria-hidden="true"></i>&nbsp; Home</a>-->
+            </div>
+        </div>
+    </div>
+
+    <script src='http://127.0.0.1:3000/socket.io/socket.io.js'></script>
+
+    <script>
+        var socket = io.connect('http://127.0.0.1:3000');
+
+        socket.on('connect', function () {
+            console.log('connected to server!');
+            var username = prompt('Your name?');
+            if (username == null || username === '') {
+                username = 'NoName';
+            }
+            socket.emit('newUser', username);
+            $('#name').val(username);
+        });
+
+        socket.on('updateChat', function (name, message) {
+            console.log('update chat log: ' + name + ' send ' + message);
+            $('#content').append('<div>' + '[' + name + ']: ' + message + ' <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:48px;height:48px;"></div>');
+        });
+        socket.on('updateUsersOnline', function (users) {
+            $('#onlineUsers').empty();
+            console.log(users);
+            $.each(users, function (key, value) {
+                $('#onlineUsers').append(
+                    "<a class='list-group-item' href='#'><i class='fa fa-circle' style='color:green' aria-hidden='true'></i>&nbsp; "+value+"</a>"
+                );
+            });
+        })
+
+        $('#textarea').keypress(function (e) {
+            if (e.which === 13) {
+                socket.emit('sendMessage', $(this).val());
+                console.log('sendMessage: ' + $(this).val());
+                $(this).val('');
+            }
+        });
+    </script>
+</body>
+
+</html>
