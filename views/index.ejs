@@ -3,85 +3,348 @@
 <html lang='en'>
 
 <head>
-    <title>Bootstrap Example</title>
+    <title>Proptit Chatbox</title>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>
     <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
     <link rel="stylesheet" href="css/font-awesome.min.css">
-</head>
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <style>
+        textarea {
+            resize: none;
+        }
 
-<body>
+        .content:before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
 
-    <div class='container'>
-        <div class='col-md-2'></div>
-        <div class='col-md-1'>
-            <!--<div class='row'>
-                <div class='btn btn-default'>Room 0</div>
-            </div>-->
-            <div class='row'>
-                <div class='btn btn-success'>Room 1</div>
-            </div>
-        </div>
-        <div class='col-md-6'>
-            <div class='row'>
-                <input id='name' class="form-control" type="text" name="name" value="name" readonly>
-            </div>
-            <div class='row'>
-                <div id='content' class='form-control' style="height: 500px; overflow-y: scroll;">
-                </div>
-            </div>
-            <div class='row'>
-                <textarea id='textarea' class="form-control" placeholder="Type your mess"></textarea>
-            </div>
-        </div>
-        <div class='col-md-3'>
-            <h3>Online</h3>
-            <div class="list-group" id='onlineUsers'>
-                
-                <!--<a class="list-group-item" href="#"><i class="fa fa-circle" style="color:green" aria-hidden="true"></i>&nbsp; Home</a>-->
-            </div>
-        </div>
-    </div>
+            display: block;
+            /*background-image: url('http://666a658c624a3c03a6b2-25cda059d975d2f318c03e90bcf17c40.r92.cf1.rackcdn.com/unsplash_527bf56961712_1.JPG');*/
+            background-image: url('/images/anime-background-wallpaper-17.jpg');
+            /*background-image: url('/images/background.jpg');*/
+            background-size: 100% 100%;
+            width: 100%;
+            height: 100%;
 
-    <script src='http://127.0.0.1:3000/socket.io/socket.io.js'></script>
+            -webkit-filter: blur(5px);
+            -moz-filter: blur(5px);
+            -o-filter: blur(5px);
+            -ms-filter: blur(5px);
+            filter: blur(5px);
+        }
 
+        .content {
+            overflow: auto;
+            position: relative;
+        }
+
+        .nopadding {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .padding-row {
+            padding-top: 7.5px;
+            padding-bottom: 7.5px;
+            padding-left: 0px;
+            padding-right: 0px;
+            margin-left: 0px;
+            margin-right: 0px;
+        }
+    </style>
+    <style>
+        #custom_carousel .controls a small {
+            font-size: 1em !important;
+        }
+
+        #menu {
+            font-family: serif;
+        }
+
+        .carousel-inner {
+            overflow: visible;
+        }
+
+        #custom_carousel .item {
+            height: auto;
+            padding: 10px 0;
+            overflow: visible;
+        }
+
+        #custom_carousel .controls {
+            overflow-x: visible;
+            overflow-y: visible;
+            padding: 0;
+            margin: 0;
+            white-space: nowrap;
+            text-align: center;
+            position: relative;
+        }
+
+        #custom_carousel .controls li {
+            display: table-cell;
+            width: 1%;
+            max-width: 90px
+        }
+
+
+        #custom_carousel .controls a small {
+            overflow: hidden;
+            display: block;
+            font-size: 10px;
+            margin-top: 5px;
+            font-weight: bold
+        }
+    </style>
     <script>
-        var socket = io.connect('http://127.0.0.1:3000');
-
-        socket.on('connect', function () {
-            console.log('connected to server!');
-            var username = prompt('Your name?');
-            if (username == null || username === '') {
-                username = 'NoName';
-            }
-            socket.emit('newUser', username);
-            $('#name').val(username);
-        });
-
-        socket.on('updateChat', function (name, message) {
-            console.log('update chat log: ' + name + ' send ' + message);
-            $('#content').append('<div>' + '[' + name + ']: ' + message + ' <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:48px;height:48px;"></div>');
-        });
-        socket.on('updateUsersOnline', function (users) {
-            $('#onlineUsers').empty();
-            console.log(users);
-            $.each(users, function (key, value) {
-                $('#onlineUsers').append(
-                    "<a class='list-group-item' href='#'><i class='fa fa-circle' style='color:green' aria-hidden='true'></i>&nbsp; "+value+"</a>"
-                );
-            });
-        })
-
-        $('#textarea').keypress(function (e) {
-            if (e.which === 13) {
-                socket.emit('sendMessage', $(this).val());
-                console.log('sendMessage: ' + $(this).val());
-                $(this).val('');
-            }
+        $(document).ready(function (ev) {
+            $('#custom_carousel').on('dropdown.bs.carousel', function (evt) {
+                $('#custom_carousel .controls li.active').removeClass('active');
+                $('#custom_carousel .controls li:eq(' + $(evt.relatedTarget).index() + ')').addClass(
+                    'active');
+            })
         });
     </script>
+</head>
+
+<body class='content'>
+
+    <div class='container-fluid'>
+        <div class='row' style='margin-top:50px;'>
+            <div class='col-md-4'>
+                <!--<img  src="/images/logo.png" style='width: 100%;'>-->
+            </div>
+            <div class='col-md-4 centering'>
+                <img src="/images/banner.png" style='width: 100%;'>
+            </div>
+        </div>
+
+        <div class='row' style='margin-top: 50px;'>
+
+            <div class='col-md-4'></div>
+
+            <div class='col-md-4'>
+                <div class='row'>
+                    <input id='name' class="form-control" type="text" name="name" value="name" readonly>
+                </div>
+                <div class='row' style='margin-top:10px;'>
+                    <div id='content' class='form-control' style="height: 500px; overflow-y: scroll;">
+                    </div>
+                </div>
+                <div class='row' style='margin-top:5px;'>
+                    <div class="input-group">
+                        <textarea id='textarea' class="form-control custom-control" rows="2" style="resize:none" placeholder="Type something"></textarea>
+                        <span class="input-group-addon btn btn-default"><i class="fa fa-smile-o" aria-hidden="true"></i></span>
+                        <span id='buttonSend' class="input-group-addon btn btn-success"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</span>
+                    </div>
+                </div>
+
+                <div class='row well'>
+                    <div class="container-fluid">
+                        <div id="custom_carousel" class="carousel dropdown" data-ride="carousel" data-interval="0">
+                            <div class="controls">
+                                <ul class="nav">
+                                    <li data-target="#custom_carousel" data-slide-to="0" class="active">
+                                        <a href="#"><img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" style="width:100%;height:100%;"><small>ՆԱԽՈՒՏԵՍՏՆԵՐ</small></a>
+                                    </li>
+                                    <li data-target="#custom_carousel" data-slide-to="1">
+                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/salads.png"><small>ԱՂՑԱՆՆԵՐ</small></a>
+                                    </li>
+                                    <li data-target="#custom_carousel" data-slide-to="2">
+                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/soups.png"><small>ԱՊՈՒՐՆԵՐ</small></a>
+                                    </li>
+                                    <li data-target="#custom_carousel" data-slide-to="3">
+                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/pizza.png"><small>ՊԻՑՑԱ</small></a>
+                                    </li>
+                                    <li data-target="#custom_carousel" data-slide-to="4">
+                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/lunch.png"><small>ԱՌԱՋԻՆ </small></a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner">
+                                <div class="item active">
+                                    <div class="container-fluid">
+                                        <div class='row '>
+                                            <div class='col-md-2 '>
+                                                <a href='#' onClick="addEmotion(1);"><img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200"
+                                                        alt="HTML5 Icon" style="width:100%;height:100%;"></a>
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
+                                            <div class="col-md-9">
+                                                <h2>Կապրեզե </h2>
+                                                <p>3.400 AMD</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
+                                            <div class="col-md-9">
+                                                <h2>Բանջարեղենային ապուր</h2>
+                                                <p>2.000 AMD</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
+                                            <div class="col-md-9">
+                                                <h2>Մարգերիտա</h2>
+                                                <p>2.000 AMD</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
+                                            <div class="col-md-9">
+                                                <h2>Կոատրո ֆորմաջի</h2>
+                                                <p>2.500 AMD</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
+                                            <div class="col-md-9">
+                                                <h2>Սպագետտի ալլա Կարբոնարա</h2>
+                                                <p>2.800 AMD</p>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="container-fluid">
+
+                                    </div>
+                                </div>
+                                <div class="item" style="padding-bottom: 500px;">
+                                    <div class="container-fluid">
+
+                                    </div>
+                                </div>
+                                <!-- End Item -->
+                            </div>
+                            <!-- End Carousel Inner -->
+                        </div>
+                        <!-- End Carousel -->
+                    </div>
+                </div>
+
+
+            </div>
+            <div class='col-md-2'>
+                <div class="pre-scrollable list-group" style='max-height: 300px;' id='onlineUsers'>
+
+                    <!--<a class="list-group-item" href="#"><i class="fa fa-circle" style="color:green" aria-hidden="true"></i>&nbsp; Home</a>-->
+                </div>
+            </div>
+        </div>
+
+        <script src='http://127.0.0.1:3000/socket.io/socket.io.js'></script>
+
+        <script>
+            var socket = io.connect('http://127.0.0.1:3000');
+
+            socket.on('connect', function () {
+                console.log('connected to server!');
+                var username = prompt('Your name?');
+                if (username == null || username === '') {
+                    username = 'NoName';
+                }
+                socket.emit('newUser', username);
+                $('#name').val(username);
+            });
+
+            socket.on('updateChat', function (name, message) {
+                console.log('update chat log: ' + name + ' send ' + message);
+                $('#content').append('<div>' + '[' + name + ']: ' + message +
+                    ' <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:48px;height:48px;"></div>'
+                );
+                $('#content').scrollTop($('#content').get(0).scrollHeight);
+            });
+            socket.on('updateUsersOnline', function (users) {
+                $('#onlineUsers').empty();
+                console.log(users);
+                $.each(users, function (key, value) {
+                    $('#onlineUsers').append(
+                        "<a class='list-group-item' href='#'><i class='fa fa-circle' style='color:green' aria-hidden='true'></i>&nbsp; " +
+                        value + "</a>"
+                    );
+                });
+            })
+
+            $('#textarea').keypress(function (e) {
+                if (e.which === 13) {
+                    socket.emit('sendMessage', $(this).val());
+                    console.log('sendMessage: ' + $(this).val());
+                    e.preventDefault();
+
+                    $('#textarea').val("");
+                    // $(this).html('')
+                }
+            });
+
+            function addEmotion(code){
+                
+            }
+        </script>
 </body>
 
 </html>
