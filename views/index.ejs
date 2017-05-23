@@ -218,14 +218,14 @@
             });
 
             socket.on('updateChat', function (name, message) {
-                console.log('update chat log: ' + name + ' send ' + message);
+                // console.log('update chat log: ' + name + ' send ' + message);
                 $('#content').append('<div>' + '<span class="user-name">[' + name + ']:</span> ' + message +
                     '</div>');
                 $('#content').scrollTop($('#content').get(0).scrollHeight);
             });
             socket.on('updateUsersOnline', function (users) {
                 $('#onlineUsers').empty();
-                console.log(users);
+                // console.log(users);
                 $.each(users, function (key, value) {
                     $('#onlineUsers').append(
                         "<a class='list-group-item' href='#'><i class='fa fa-circle' style='color:green' aria-hidden='true'></i>&nbsp; " +
@@ -291,7 +291,7 @@
 
             function sendMessage() {
                 socket.emit('sendMessage', $('#textarea').val());
-                console.log('sendMessage: ' + $('#textarea').val());
+                // console.log('sendMessage: ' + $('#textarea').val());
                 $('#textarea').val("");
             }
 

@@ -21,7 +21,9 @@ app.set('port', port);
 
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
-
+var MongoClient = require('mongodb').MongoClient;
+var uri = 'mongodb://admin:admin@ds151141.mlab.com:51141/heroku_2js7kl13';
+// var uri = 'mongodb://localhost:27017/chat';
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -113,40 +115,62 @@ function replaceAll(str, find, replace) {
 function genIcons(link) {
   return '<img src="' + link + '" style="width:48px;height:48px;">';
 };
-io.sockets.on('connection', function (socket) {
-  socket.on('newUser', function (username) {
-    console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
-    socket.username = username;
-    users[username] = username;
-    socket.room = rooms[1];
-    socket.join(socket.room);
-    socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
-    socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', username + ' has connected to this room');
-    io.sockets.in(socket.room).emit('updateUsersOnline', users);
+MongoClient.connect(uri, function (err, db) {
+  var collection = db.collection('messages');
+
+  io.sockets.on('connection', function (socket) {
+    socket.on('newUser', function (username) {
+      console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
+      socket.username = username;
+      users[username] = username;
+      socket.room = rooms[1];
+      socket.join(socket.room);
+      collection.find({}).sort({
+        _id: 1
+      }).limit(100).toArray(function (err, result) {
+        if (err) throw err;
+        for (var i = 0; i < result.length; i++) {
+          socket.emit('updateChat', result[i].name, result[i].message);
+        }
+        socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
+      });
+
+      socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', username + ' has connected to this room');
+      io.sockets.in(socket.room).emit('updateUsersOnline', users);
+    });
+
+    socket.on('sendMessage', function (message) {
+      // console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
+
+      for (var key in icons) {
+        message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
+      }
+      message = replaceAll(message, 'proptit', genIcons('/images/logo.png'))
+      message = yahoo(message);
+      io.sockets.in(socket.room).emit('updateChat', socket.username, message);
+      collection.insert({
+        name: socket.username,
+        content: message
+      }, function (err, o) {
+        if (err) {
+          console.warn(err.message);
+        } else {
+          console.log("chat message inserted into db!");
+        }
+      });
+    });
+
+    socket.on('disconnect', function () {
+      socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' has disconnected');
+      console.log(socket.username + ' - room: ' + socket.room + ' - has disconnected!');
+      socket.leave(socket.room);
+      delete users[socket.username]
+      io.sockets.in(socket.room).emit('updateUsersOnline', users);
+
+    });
   });
 
-  socket.on('sendMessage', function (message) {
-    // console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
-
-    for (var key in icons) {
-      message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
-    }
-    message = replaceAll(message, 'proptit', genIcons('/images/logo.png') )
-    message = yahoo(message);
-    io.sockets.in(socket.room).emit('updateChat', socket.username, message);
-  });
-
-  socket.on('disconnect', function () {
-    socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' has disconnected');
-    console.log(socket.username + ' - room: ' + socket.room + ' - has disconnected!');
-    socket.leave(socket.room);
-    delete users[socket.username]
-    io.sockets.in(socket.room).emit('updateUsersOnline', users);
-
-  });
 });
-
-
 
 
 function yahoo(message) {
