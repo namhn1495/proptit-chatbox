@@ -143,10 +143,11 @@ io.sockets.on('connection', function (socket) {
     socket.room = rooms[1];
     socket.join(socket.room);
     Message.find({}).sort({
-      __id: 1
+      created: -1
     }).limit(100).exec(function (err, docs) {
       if (err) throw err;
-      for (var i = 0; i < docs.length; i++) {
+      for (var i = docs.length-1; i >= 0; i--) {
+        console.log(docs[i].message);
         socket.emit('updateChat', docs[i].name, docs[i].message);
       }
       socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
@@ -158,22 +159,24 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('sendMessage', function (message) {
     // console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
-
-    for (var key in icons) {
-      message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
+    var whitespacePattern = /^\s*$/;
+    if (!(/<[a-z][\s\S]*>/i.test(message)) && !whitespacePattern.test(message)) {
+      for (var key in icons) {
+        message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
+      }
+      message = replaceAll(message, 'proptit', genIcons('http://i.imgur.com/xvRbVag.png'))
+      message = yahoo(message);
+      socket.broadcast.to(socket.room).emit('updateChat', socket.username, message);
+      socket.emit('selfUpdateChat', message);
+      var newMess = new Message({
+        name: socket.username,
+        message: message
+      });
+      newMess.save(function (err) {
+        if (err) throw err;
+        console.log('insert mess to db!');
+      })
     }
-    message = replaceAll(message, 'proptit', genIcons('http://i.imgur.com/xvRbVag.png'))
-    message = yahoo(message);
-    socket.broadcast.to(socket.room).emit('updateChat', socket.username, message);
-    socket.emit('selfUpdateChat',message);
-    var newMess = new Message({
-      name: socket.username,
-      message: message
-    });
-    newMess.save(function (err) {
-      if (err) throw err;
-      console.log('insert mess to db!');
-    })
   });
 
   socket.on('disconnect', function () {

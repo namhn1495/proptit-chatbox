@@ -329,9 +329,14 @@
         function sendMessage() {
             var val = $('#textarea').val();
             if (val != null && val != '') {
-                socket.emit('sendMessage', val);
-                // console.log('sendMessage: ' + $('#textarea').val());
-                $('#textarea').val("");
+                var whitespacePattern = /^\s*$/;
+                if (whitespacePattern.test(val) || whitespacePattern.test(val)) {
+
+                } else {
+                    socket.emit('sendMessage', val);
+                    // console.log('sendMessage: ' + $('#textarea').val());
+                    $('#textarea').val("");
+                }
             }
         }
 
