@@ -252,10 +252,13 @@
                 '</div></div></div>')
             $('#content').scrollTop($('#content').get(0).scrollHeight);
         });
-        socket.on('selfUpdateChat', function ( message) {
-            $('#content').append('<div class="message right appeared"><div class="text_wrapper"><div class="text"> ' + message +
+        socket.on('selfUpdateChat', function (message) {
+            $('#content').append(
+                '<div class="message right appeared"><div class="text_wrapper"><div class="text"> ' +
+                message +
                 '</div></div></div>')
             $('#content').scrollTop($('#content').get(0).scrollHeight);
+
         });
         socket.on('updateUsersOnline', function (users) {
             $('#onlineUsers').empty();
@@ -324,9 +327,12 @@
         });
 
         function sendMessage() {
-            socket.emit('sendMessage', $('#textarea').val());
-            // console.log('sendMessage: ' + $('#textarea').val());
-            $('#textarea').val("");
+            var val = $('#textarea').val();
+            if (val != null && val != '') {
+                socket.emit('sendMessage', val);
+                // console.log('sendMessage: ' + $('#textarea').val());
+                $('#textarea').val("");
+            }
         }
 
         function addEmotion(code) {
