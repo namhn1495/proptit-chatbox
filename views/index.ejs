@@ -10,23 +10,7 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>
     <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
     <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
+
     <style>
         textarea {
             resize: none;
@@ -118,6 +102,17 @@
             margin-top: 5px;
             font-weight: bold
         }
+
+        .user-name {
+            color: darkviolet;
+        }
+        .welcome{
+            color: darkcyan;
+        }
+
+        .well {
+            background-color: white;
+        }
     </style>
     <script>
         $(document).ready(function (ev) {
@@ -144,7 +139,42 @@
 
         <div class='row' style='margin-top: 50px;'>
 
-            <div class='col-md-4'></div>
+            <div class='col-md-4' style='margin-right: 10px; margin-left:10px;'>
+
+                <div id='emoticon_bar' class='row well' style='height: 603px; max-height: 603px; display: none; '>
+                    <div class="container-fluid" style='height: 100%; max-height: 100%;'>
+                        <div id="custom_carousel" class="carousel dropdown" data-ride="carousel" data-interval="0" style='height: 100%; max-height: 100%;'>
+
+
+
+                            <div class="controls">
+                                <ul class="nav" id='tabs'>
+                                    <li data-target="#custom_carousel" data-slide-to="0" class="active">
+                                        <a href="#"><img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" style="width:48px;height:48px;"><small>Yoyo</small></a>
+                                    </li>
+                                    <li data-target="#custom_carousel" data-slide-to="1">
+                                        <a href="#"><img src="http://blog.uhm.vn/emo/onion/22.gif" style="width:48px;height:48px;"><small>Onion</small></a>
+                                    </li>
+                                    <li data-target="#custom_carousel" data-slide-to="2">
+                                        <a href="#"><img src="http://blog.uhm.vn/emo/babysoldier/10.gif" style="width:48px;height:48px;"><small>Soldier</small></a>
+                                    </li>
+                                    <li data-target="#custom_carousel" data-slide-to="3">
+                                        <a href="#"><img src="http://blog.uhm.vn/emo/bpopo/65.gif" style="width:48px;height:48px;"><small>Popo</small></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner" id='icons' style='height: 80%; max-height: 80%; overflow: auto;'>
+                                <!-- End Item -->
+                            </div>
+                            <!-- End Carousel Inner -->
+                        </div>
+                        <!-- End Carousel -->
+                    </div>
+                </div>
+
+
+            </div>
 
             <div class='col-md-4'>
                 <div class='row'>
@@ -157,133 +187,8 @@
                 <div class='row' style='margin-top:5px;'>
                     <div class="input-group">
                         <textarea id='textarea' class="form-control custom-control" rows="2" style="resize:none" placeholder="Type something"></textarea>
-                        <span class="input-group-addon btn btn-default"><i class="fa fa-smile-o" aria-hidden="true"></i></span>
-                        <span id='buttonSend' class="input-group-addon btn btn-success"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</span>
-                    </div>
-                </div>
-
-                <div class='row well'>
-                    <div class="container-fluid">
-                        <div id="custom_carousel" class="carousel dropdown" data-ride="carousel" data-interval="0">
-                            <div class="controls">
-                                <ul class="nav">
-                                    <li data-target="#custom_carousel" data-slide-to="0" class="active">
-                                        <a href="#"><img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" style="width:100%;height:100%;"><small>ՆԱԽՈՒՏԵՍՏՆԵՐ</small></a>
-                                    </li>
-                                    <li data-target="#custom_carousel" data-slide-to="1">
-                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/salads.png"><small>ԱՂՑԱՆՆԵՐ</small></a>
-                                    </li>
-                                    <li data-target="#custom_carousel" data-slide-to="2">
-                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/soups.png"><small>ԱՊՈՒՐՆԵՐ</small></a>
-                                    </li>
-                                    <li data-target="#custom_carousel" data-slide-to="3">
-                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/pizza.png"><small>ՊԻՑՑԱ</small></a>
-                                    </li>
-                                    <li data-target="#custom_carousel" data-slide-to="4">
-                                        <a href="#"><img src="https://bufiles.blob.core.windows.net/co3617/menu_icons/lunch.png"><small>ԱՌԱՋԻՆ </small></a>
-                                    </li>
-
-                                </ul>
-                            </div>
-                            <!-- Wrapper for slides -->
-                            <div class="carousel-inner">
-                                <div class="item active">
-                                    <div class="container-fluid">
-                                        <div class='row '>
-                                            <div class='col-md-2 '>
-                                                <a href='#' onClick="addEmotion(1);"><img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200"
-                                                        alt="HTML5 Icon" style="width:100%;height:100%;"></a>
-                                            </div>
-                                            <div class='col-md-2'>
-                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
-                                            </div>
-                                            <div class='col-md-2'>
-                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
-                                            </div>
-                                            <div class='col-md-2'>
-                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
-                                            </div>
-                                            <div class='col-md-2'>
-                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
-                                            </div>
-                                            <div class='col-md-2'>
-                                                <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:100%;height:100%;">
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
-                                            <div class="col-md-9">
-                                                <h2>Կապրեզե </h2>
-                                                <p>3.400 AMD</p>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
-                                            <div class="col-md-9">
-                                                <h2>Բանջարեղենային ապուր</h2>
-                                                <p>2.000 AMD</p>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
-                                            <div class="col-md-9">
-                                                <h2>Մարգերիտա</h2>
-                                                <p>2.000 AMD</p>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
-                                            <div class="col-md-9">
-                                                <h2>Կոատրո ֆորմաջի</h2>
-                                                <p>2.500 AMD</p>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-md-3"><img src="http://placehold.it/350x100" class="img-responsive"></div>
-                                            <div class="col-md-9">
-                                                <h2>Սպագետտի ալլա Կարբոնարա</h2>
-                                                <p>2.800 AMD</p>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="container-fluid">
-
-                                    </div>
-                                </div>
-                                <div class="item" style="padding-bottom: 500px;">
-                                    <div class="container-fluid">
-
-                                    </div>
-                                </div>
-                                <!-- End Item -->
-                            </div>
-                            <!-- End Carousel Inner -->
-                        </div>
-                        <!-- End Carousel -->
+                        <span onclick="$('#emoticon_bar').slideToggle('fast');" class="input-group-addon btn btn-default"><i class="fa fa-smile-o" aria-hidden="true"></i></span>
+                        <span onclick="sendMessage()" id='buttonSend' class="input-group-addon btn btn-success"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</span>
                     </div>
                 </div>
 
@@ -297,10 +202,10 @@
             </div>
         </div>
 
-        <script src='http://127.0.0.1:3000/socket.io/socket.io.js'></script>
+        <script src='/socket.io/socket.io.js'></script>
 
         <script>
-            var socket = io.connect('http://127.0.0.1:3000');
+            var socket = io.connect('/');
 
             socket.on('connect', function () {
                 console.log('connected to server!');
@@ -314,9 +219,8 @@
 
             socket.on('updateChat', function (name, message) {
                 console.log('update chat log: ' + name + ' send ' + message);
-                $('#content').append('<div>' + '[' + name + ']: ' + message +
-                    ' <img src="http://rs421.pbsrc.com/albums/pp299/treante/emoticon/rokok.gif~c200" alt="HTML5 Icon" style="width:48px;height:48px;"></div>'
-                );
+                $('#content').append('<div>' + '<span class="user-name">[' + name + ']:</span> ' + message +
+                    '</div>');
                 $('#content').scrollTop($('#content').get(0).scrollHeight);
             });
             socket.on('updateUsersOnline', function (users) {
@@ -330,19 +234,71 @@
                 });
             })
 
-            $('#textarea').keypress(function (e) {
-                if (e.which === 13) {
-                    socket.emit('sendMessage', $(this).val());
-                    console.log('sendMessage: ' + $(this).val());
-                    e.preventDefault();
 
-                    $('#textarea').val("");
+            $('#textarea').keypress(function (e) {
+                if (e.which === 13 && e.shiftKey == false) {
+                    sendMessage();
+                    e.preventDefault();
                     // $(this).html('')
                 }
             });
 
-            function addEmotion(code){
-                
+
+            $(document).ready(function () {
+                $.getJSON("emotions", function (data) {
+
+                    $.each(data, function (key, val) {
+                        // console.log("<li id='" + key + "'>" + val + "</li>");
+                        // console.log(val[0].link);
+                        var s = "";
+                        if (key != 'yahoo') {
+                            s += "<div class='item" + (key === 'yoyo' ? " active" : "") +
+                                "'><div class='container-fluid'>";
+
+                            var len = parseInt(val.length / 6);
+                            var du = val.length % 6;
+                            // console.log(val.length+" "+len+" "+du);
+                            var pos = 0;
+                            for (var i = 0; i < len; i++) {
+                                s += "<div class='row'>";
+                                for (var j = 0; j < 6; j++) {
+                                    s += "<div class='col-md-2 '>";
+                                    s += "<a  onClick='addEmotion(" + val[pos].code +
+                                        ");'><img src='" + val[pos].link +
+                                        "' style='width:48px;height:48px;'></a>";
+                                    s += "</div>";
+                                    pos++;
+                                }
+                                s += "</div>";
+                            }
+                            s += "<div class='row'>";
+                            for (var i = 0; i < du; i++) {
+                                s += "<div class='col-md-2 '>";
+                                s += "<a  onClick='addEmotion(" + val[pos].code +
+                                    ");'><img src='" + val[pos].link +
+                                    "' style='width:48px;height:48px;'></a>";
+                                s += "</div>";
+                                pos++;
+                            }
+                            s += "</div>";
+                            s += "</div></div>";
+                            // console.log(s);
+                            $('#icons').append(s);
+                        }
+                    });
+                });
+            });
+
+            function sendMessage() {
+                socket.emit('sendMessage', $('#textarea').val());
+                console.log('sendMessage: ' + $('#textarea').val());
+                $('#textarea').val("");
+            }
+
+            function addEmotion(code) {
+                oldVal = $('#textarea').val();
+                $('#textarea').val(oldVal + '{' + code + '}');
+                $('#textarea').focus();
             }
         </script>
 </body>

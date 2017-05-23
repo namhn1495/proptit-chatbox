@@ -94,6 +94,25 @@ function onListening() {
 
 var rooms = ['Room 0', 'Room 1'];
 var users = {};
+var json = JSON.parse(require('fs').readFileSync('public/emotions/emotions.json', 'utf8'));
+var icons = {};
+for (var name in json) {
+  for (var i = 0; i < json[name].length; i++) {
+    icons[json[name][i].code] = json[name][i].link;
+  }
+};
+
+function escapeRegExp(str) {
+  return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+};
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+};
+
+function genIcons(link) {
+  return '<img src="' + link + '" style="width:48px;height:48px;">';
+};
 io.sockets.on('connection', function (socket) {
   socket.on('newUser', function (username) {
     console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
@@ -101,13 +120,19 @@ io.sockets.on('connection', function (socket) {
     users[username] = username;
     socket.room = rooms[1];
     socket.join(socket.room);
-    socket.emit('updateChat', 'SERVER', 'you have connected to ' + socket.room + '!');
+    socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
     socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', username + ' has connected to this room');
     io.sockets.in(socket.room).emit('updateUsersOnline', users);
   });
 
   socket.on('sendMessage', function (message) {
-    console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
+    // console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
+
+    for (var key in icons) {
+      message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
+    }
+    message = replaceAll(message, 'proptit', genIcons('/images/logo.png') )
+    message = yahoo(message);
     io.sockets.in(socket.room).emit('updateChat', socket.username, message);
   });
 
@@ -120,3 +145,301 @@ io.sockets.on('connection', function (socket) {
 
   });
 });
+
+
+
+
+function yahoo(message) {
+  var g = '';
+  for (var i = 0; i < message.length; i++) {
+    if ((i + 3) < message.length && message[i + 0] == '>' && message[i + 1] == ':' && message[i + 2] == 'D' && message[i + 3] == '<') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/6.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '#' && message[i + 1] == ':' && message[i + 2] == '-' && message[i + 3] == 'S') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/18.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == 'O' && message[i + 1] == ':' && message[i + 2] == '-' && message[i + 3] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/25.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '<' && message[i + 1] == ':' && message[i + 2] == '-' && message[i + 3] == 'P') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/36.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'S' && message[i + 3] == 'S') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/42.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '<' && message[i + 1] == ')' && message[i + 2] == ':' && message[i + 3] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/48.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'b' && message[i + 3] == 'd') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/113.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '^' && message[i + 1] == '#' && message[i + 2] == '(' && message[i + 3] == '^') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/114.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '?' && message[i + 3] == '?') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/106.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '3' && message[i + 1] == ':' && message[i + 2] == '-' && message[i + 3] == 'O') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/50.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == ':' && message[i + 1] == '(' && message[i + 2] == '|' && message[i + 3] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/51.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '@' && message[i + 1] == '}' && message[i + 2] == ';' && message[i + 3] == '-') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/53.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '*' && message[i + 1] == '*' && message[i + 2] == '=' && message[i + 3] == '=') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/55.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '(' && message[i + 1] == '~' && message[i + 2] == '~' && message[i + 3] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/56.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '*' && message[i + 1] == '-' && message[i + 2] == ':' && message[i + 3] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/58.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '[' && message[i + 1] == '-' && message[i + 2] == 'O' && message[i + 3] == '<') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/63.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == ':' && message[i + 1] == ')' && message[i + 2] == '>' && message[i + 3] == '-') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/67.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '^' && message[i + 1] == ':' && message[i + 2] == ')' && message[i + 3] == '^') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/77.gif">';
+      i = i + 3;
+    } else if ((i + 3) < message.length && message[i + 0] == '[' && message[i + 1] == '.' && message[i + 2] == '.' && message[i + 3] == ']') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/transformer.gif">';
+      i = i + 3;
+    } else if ((i + 2) < message.length && message[i + 0] == ';' && message[i + 1] == ';' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/5.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '/') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/7.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '"' && message[i + 2] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/9.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '*') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/11.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '=' && message[i + 1] == '(' && message[i + 2] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/12.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'O') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/13.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'B' && message[i + 1] == '-' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/16.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'S') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/17.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '>' && message[i + 1] == ':' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/19.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '(' && message[i + 2] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/20.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == ')' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/21.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '/' && message[i + 1] == ':' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/23.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '=' && message[i + 1] == ')' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/24.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'B') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/26.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'c') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/101.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == ')' && message[i + 2] == ']') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/100.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '~' && message[i + 1] == 'X' && message[i + 2] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/102.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'h') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/103.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 't') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/104.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '8' && message[i + 1] == '-' && message[i + 2] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/105.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'I' && message[i + 1] == '-' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/28.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '8' && message[i + 1] == '-' && message[i + 2] == '|') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/29.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'L' && message[i + 1] == '-' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/30.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '&') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/31.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '$') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/32.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '[' && message[i + 1] == '-' && message[i + 2] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/33.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == 'O' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/34.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '8' && message[i + 1] == '-' && message[i + 2] == '}') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/35.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '(' && message[i + 1] == ':' && message[i + 2] == '|') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/37.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '=' && message[i + 1] == 'P' && message[i + 2] == '~') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/38.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '?') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/39.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '#' && message[i + 1] == '-' && message[i + 2] == 'o') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/40.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '=' && message[i + 1] == 'D' && message[i + 2] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/41.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '@' && message[i + 1] == '-' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/43.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '^' && message[i + 2] == 'o') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/44.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '=' && message[i + 1] == 'D' && message[i + 2] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/45.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '<') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/46.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '>' && message[i + 1] == ':' && message[i + 2] == 'P') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/47.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'X' && message[i + 1] == '_' && message[i + 2] == 'X') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/109.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '!' && message[i + 2] == '!') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/110.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'q') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/112.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == 'o' && message[i + 2] == '3') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/108.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '%' && message[i + 1] == '-' && message[i + 2] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/107.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '@' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/49.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '~' && message[i + 1] == ':' && message[i + 2] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/52.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '%' && message[i + 1] == '%' && message[i + 2] == '-') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/54.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '~' && message[i + 1] == 'O' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/57.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '8' && message[i + 1] == '-' && message[i + 2] == 'X') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/59.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '=' && message[i + 1] == ':' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/60.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '>' && message[i + 1] == '-' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/61.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'L') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/62.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '$' && message[i + 1] == '-' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/64.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '"') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/65.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'b' && message[i + 1] == '-' && message[i + 2] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/66.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '[' && message[i + 1] == '-' && message[i + 2] == 'X') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/68.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '>' && message[i + 1] == ':' && message[i + 2] == '/') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/70.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ';' && message[i + 1] == ')' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/71.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == '@') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/76.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == '-' && message[i + 2] == 'j') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/78.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '(' && message[i + 1] == '*' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/79.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'o' && message[i + 1] == '-' && message[i + 2] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/72.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'o' && message[i + 1] == '=' && message[i + 2] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/73.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == 'o' && message[i + 1] == '-' && message[i + 2] == '+') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/74.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == '(' && message[i + 1] == '%' && message[i + 2] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/75.gif">';
+      i = i + 2;
+    } else if ((i + 2) < message.length && message[i + 0] == ':' && message[i + 1] == 'b' && message[i + 2] == 'z') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/115.gif">';
+      i = i + 2;
+    } else if ((i + 1) < message.length && message[i + 0] == ':' && message[i + 1] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/1.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == ':' && message[i + 1] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/2.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == ';' && message[i + 1] == ')') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/3.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == ':' && message[i + 1] == 'D') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/4.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == ':' && message[i + 1] == 'x') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/8.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == ':' && message[i + 1] == 'P') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/10.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == 'X' && message[i + 1] == '(') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/14.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == ':' && message[i + 1] == '>') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/15.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == ':' && message[i + 1] == '|') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/22.gif">';
+      i = i + 1;
+    } else if ((i + 1) < message.length && message[i + 0] == '=' && message[i + 1] == ';') {
+      g += '<img src="http://blog.uhm.vn/emo/yahoo/27.gif">';
+      i = i + 1;
+    } else
+
+    {
+      g += message[i];
+    }
+
+  }
+  return g;
+}
