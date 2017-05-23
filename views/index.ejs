@@ -10,6 +10,7 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>
     <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
     <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/message.css">
 
     <style>
         textarea {
@@ -106,7 +107,8 @@
         .user-name {
             color: darkviolet;
         }
-        .welcome{
+
+        .welcome {
             color: darkcyan;
         }
 
@@ -139,9 +141,9 @@
 
         <div class='row' style='margin-top: 50px;'>
 
-            <div class='col-md-4' style='margin-right: 10px; margin-left:10px;'>
+            <div class='col-md-4' style=' margin-left:10px; '>
 
-                <div id='emoticon_bar' class='row well' style='height: 603px; max-height: 603px; display: none; '>
+                <div id='emoticon_bar' class='row top_menu' style='height: 500px;; max-height: 603px; display: none; border-radius: 10px; '>
                     <div class="container-fluid" style='height: 100%; max-height: 100%;'>
                         <div id="custom_carousel" class="carousel dropdown" data-ride="carousel" data-interval="0" style='height: 100%; max-height: 100%;'>
 
@@ -178,19 +180,42 @@
 
             <div class='col-md-4'>
                 <div class='row'>
-                    <input id='name' class="form-control" type="text" name="name" value="name" readonly>
-                </div>
-                <div class='row' style='margin-top:10px;'>
-                    <div id='content' class='form-control' style="height: 500px; overflow-y: scroll;">
+
+                    <div class="top_menu">
+                        <div class="buttons">
+                            <div class="button close"></div>
+                            <div class="button minimize"></div>
+                            <div class="button maximize"></div>
+                        </div>
+                        <div class="title">Chat</div>
+                    </div>
+                    <div class="messages" style='background-color: white;' id='content'>
+
+                    </div>
+                    <div class="bottom_wrapper clearfix">
+                        <div class="input-group">
+                            <textarea id='textarea' class="form-control custom-control" rows="2" style="resize:none" placeholder="Type something"></textarea>
+                            <span onclick="$('#emoticon_bar').slideToggle('fast');" class="input-group-addon btn btn-default"><i class="fa fa-smile-o" aria-hidden="true"></i></span>
+                            <span onclick="sendMessage()" id='buttonSend' class="input-group-addon btn btn-success"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</span>
+                        </div>
+
                     </div>
                 </div>
-                <div class='row' style='margin-top:5px;'>
+                <!--<div class='row'>
+                    <input id='name' class="form-control" type="text" name="name" value="name" readonly>
+                </div>-->
+                <!--<div class='row' style='margin-top:10px;'>
+                    <div id='content' class='form-control messages' style="height: 500px; overflow-y: scroll;">
+
+                    </div>
+                </div>-->
+                <!--<div class='row' style='margin-top:100px;'>
                     <div class="input-group">
                         <textarea id='textarea' class="form-control custom-control" rows="2" style="resize:none" placeholder="Type something"></textarea>
                         <span onclick="$('#emoticon_bar').slideToggle('fast');" class="input-group-addon btn btn-default"><i class="fa fa-smile-o" aria-hidden="true"></i></span>
                         <span onclick="sendMessage()" id='buttonSend' class="input-group-addon btn btn-success"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</span>
                     </div>
-                </div>
+                </div>-->
 
 
             </div>
@@ -201,78 +226,76 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <script src='/socket.io/socket.io.js'></script>
+    <script src='/socket.io/socket.io.js'></script>
 
-        <script>
-            var socket = io.connect('/');
+    <script>
+        var socket = io.connect('/');
 
-            socket.on('connect', function () {
-                console.log('connected to server!');
-                var username = prompt('Your name?');
-                if (username == null || username === '') {
-                    username = 'NoName';
-                }
-                socket.emit('newUser', username);
-                $('#name').val(username);
+        socket.on('connect', function () {
+            console.log('connected to server!');
+            var username = prompt('Your name?');
+            if (username == null || username === '') {
+                username = 'NoName';
+            }
+            socket.emit('newUser', username);
+            $('#name').val(username);
+        });
+
+        socket.on('updateChat', function (name, message) {
+            // console.log('update chat log: ' + name + ' send ' + message);
+            // $('#content').append('<div>' + '<span class="user-name">[' + name + ']:</span> ' + message +
+            //     '</div>');
+            $('#content').append('<div class="message left appeared"><span class="user-name left text">[' +
+                name + ']:</span><div class="text_wrapper"><div class="text"> ' + message +
+                '</div></div></div>')
+            $('#content').scrollTop($('#content').get(0).scrollHeight);
+        });
+        socket.on('selfUpdateChat', function ( message) {
+            $('#content').append('<div class="message right appeared"><div class="text_wrapper"><div class="text"> ' + message +
+                '</div></div></div>')
+            $('#content').scrollTop($('#content').get(0).scrollHeight);
+        });
+        socket.on('updateUsersOnline', function (users) {
+            $('#onlineUsers').empty();
+            // console.log(users);
+            $.each(users, function (key, value) {
+                $('#onlineUsers').append(
+                    "<a class='list-group-item' href='#' ><i class='fa fa-circle' style='color:green' aria-hidden='true'></i>&nbsp; " +
+                    value + "</a>"
+                );
             });
-
-            socket.on('updateChat', function (name, message) {
-                // console.log('update chat log: ' + name + ' send ' + message);
-                $('#content').append('<div>' + '<span class="user-name">[' + name + ']:</span> ' + message +
-                    '</div>');
-                $('#content').scrollTop($('#content').get(0).scrollHeight);
-            });
-            socket.on('updateUsersOnline', function (users) {
-                $('#onlineUsers').empty();
-                // console.log(users);
-                $.each(users, function (key, value) {
-                    $('#onlineUsers').append(
-                        "<a class='list-group-item' href='#'><i class='fa fa-circle' style='color:green' aria-hidden='true'></i>&nbsp; " +
-                        value + "</a>"
-                    );
-                });
-            })
+        })
 
 
-            $('#textarea').keypress(function (e) {
-                if (e.which === 13 && e.shiftKey == false) {
-                    sendMessage();
-                    e.preventDefault();
-                    // $(this).html('')
-                }
-            });
+        $('#textarea').keypress(function (e) {
+            if (e.which === 13 && e.shiftKey == false) {
+                sendMessage();
+                e.preventDefault();
+                // $(this).html('')
+            }
+        });
 
 
-            $(document).ready(function () {
-                $.getJSON("emotions", function (data) {
+        $(document).ready(function () {
+            $.getJSON("emotions", function (data) {
 
-                    $.each(data, function (key, val) {
-                        // console.log("<li id='" + key + "'>" + val + "</li>");
-                        // console.log(val[0].link);
-                        var s = "";
-                        if (key != 'yahoo') {
-                            s += "<div class='item" + (key === 'yoyo' ? " active" : "") +
-                                "'><div class='container-fluid'>";
+                $.each(data, function (key, val) {
+                    // console.log("<li id='" + key + "'>" + val + "</li>");
+                    // console.log(val[0].link);
+                    var s = "";
+                    if (key != 'yahoo') {
+                        s += "<div class='item" + (key === 'yoyo' ? " active" : "") +
+                            "'><div class='container-fluid'>";
 
-                            var len = parseInt(val.length / 6);
-                            var du = val.length % 6;
-                            // console.log(val.length+" "+len+" "+du);
-                            var pos = 0;
-                            for (var i = 0; i < len; i++) {
-                                s += "<div class='row'>";
-                                for (var j = 0; j < 6; j++) {
-                                    s += "<div class='col-md-2 '>";
-                                    s += "<a  onClick='addEmotion(" + val[pos].code +
-                                        ");'><img src='" + val[pos].link +
-                                        "' style='width:48px;height:48px;'></a>";
-                                    s += "</div>";
-                                    pos++;
-                                }
-                                s += "</div>";
-                            }
+                        var len = parseInt(val.length / 6);
+                        var du = val.length % 6;
+                        // console.log(val.length+" "+len+" "+du);
+                        var pos = 0;
+                        for (var i = 0; i < len; i++) {
                             s += "<div class='row'>";
-                            for (var i = 0; i < du; i++) {
+                            for (var j = 0; j < 6; j++) {
                                 s += "<div class='col-md-2 '>";
                                 s += "<a  onClick='addEmotion(" + val[pos].code +
                                     ");'><img src='" + val[pos].link +
@@ -281,26 +304,37 @@
                                 pos++;
                             }
                             s += "</div>";
-                            s += "</div></div>";
-                            // console.log(s);
-                            $('#icons').append(s);
                         }
-                    });
+                        s += "<div class='row'>";
+                        for (var i = 0; i < du; i++) {
+                            s += "<div class='col-md-2 '>";
+                            s += "<a  onClick='addEmotion(" + val[pos].code +
+                                ");'><img src='" + val[pos].link +
+                                "' style='width:48px;height:48px;'></a>";
+                            s += "</div>";
+                            pos++;
+                        }
+                        s += "</div>";
+                        s += "</div></div>";
+                        // console.log(s);
+                        $('#icons').append(s);
+                    }
                 });
             });
+        });
 
-            function sendMessage() {
-                socket.emit('sendMessage', $('#textarea').val());
-                // console.log('sendMessage: ' + $('#textarea').val());
-                $('#textarea').val("");
-            }
+        function sendMessage() {
+            socket.emit('sendMessage', $('#textarea').val());
+            // console.log('sendMessage: ' + $('#textarea').val());
+            $('#textarea').val("");
+        }
 
-            function addEmotion(code) {
-                oldVal = $('#textarea').val();
-                $('#textarea').val(oldVal + '{' + code + '}');
-                $('#textarea').focus();
-            }
-        </script>
+        function addEmotion(code) {
+            oldVal = $('#textarea').val();
+            $('#textarea').val(oldVal + '{' + code + '}');
+            $('#textarea').focus();
+        }
+    </script>
 </body>
 
 </html>

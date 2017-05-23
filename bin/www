@@ -21,9 +21,25 @@ app.set('port', port);
 
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
-var MongoClient = require('mongodb').MongoClient;
+var mongoose = require('mongoose');
+
 var uri = 'mongodb://admin:admin@ds151141.mlab.com:51141/heroku_2js7kl13';
 // var uri = 'mongodb://localhost:27017/chat';
+
+
+mongoose.connect(uri, function (err) {
+  if (err) throw err;
+  console.log('Connected!');
+});
+var messageSchema = mongoose.Schema({
+  name: String,
+  message: String,
+  created: {
+    type: Date,
+    default: Date.now
+  }
+});
+var Message = mongoose.model('Message', messageSchema);
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -118,23 +134,22 @@ function genIcons(link) {
 
 
 io.sockets.on('connection', function (socket) {
+
+
   socket.on('newUser', function (username) {
     console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
     socket.username = username;
     users[username] = username;
     socket.room = rooms[1];
     socket.join(socket.room);
-    MongoClient.connect(uri, function (err, db) {
-      db.collection('messages').find({}).sort({
-        _id: 1
-      }).limit(100).toArray(function (err, result) {
-        if (err) throw err;
-        for (var i = 0; i < result.length; i++) {
-          socket.emit('updateChat', result[i].name, result[i].message);
-        }
-        socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
-        db.close();
-      });
+    Message.find({}).sort({
+      __id: 1
+    }).limit(100).exec(function (err, docs) {
+      if (err) throw err;
+      for (var i = 0; i < docs.length; i++) {
+        socket.emit('updateChat', docs[i].name, docs[i].message);
+      }
+      socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
     });
 
     socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', username + ' has connected to this room');
@@ -147,19 +162,18 @@ io.sockets.on('connection', function (socket) {
     for (var key in icons) {
       message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
     }
-    message = replaceAll(message, 'proptit', genIcons('/images/logo.png'))
+    message = replaceAll(message, 'proptit', genIcons('http://i.imgur.com/xvRbVag.png'))
     message = yahoo(message);
-    io.sockets.in(socket.room).emit('updateChat', socket.username, message);
-    MongoClient.connect(uri, function (err, db) {
-      db.collection('messages').insertOne({
-        name: socket.username,
-        message: message
-      }, function (err, o) {
-        if (err) throw err;
-        console.log("chat message inserted into db!");
-        db.close();
-      });
+    socket.broadcast.to(socket.room).emit('updateChat', socket.username, message);
+    socket.emit('selfUpdateChat',message);
+    var newMess = new Message({
+      name: socket.username,
+      message: message
     });
+    newMess.save(function (err) {
+      if (err) throw err;
+      console.log('insert mess to db!');
+    })
   });
 
   socket.on('disconnect', function () {
@@ -168,7 +182,6 @@ io.sockets.on('connection', function (socket) {
     socket.leave(socket.room);
     delete users[socket.username]
     io.sockets.in(socket.room).emit('updateUsersOnline', users);
-    // db.close();
   });
 });
 
