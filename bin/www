@@ -115,17 +115,17 @@ function replaceAll(str, find, replace) {
 function genIcons(link) {
   return '<img src="' + link + '" style="width:48px;height:48px;">';
 };
-MongoClient.connect(uri, function (err, db) {
-  var collection = db.collection('messages');
 
-  io.sockets.on('connection', function (socket) {
-    socket.on('newUser', function (username) {
-      console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
-      socket.username = username;
-      users[username] = username;
-      socket.room = rooms[1];
-      socket.join(socket.room);
-      collection.find({}).sort({
+
+io.sockets.on('connection', function (socket) {
+  socket.on('newUser', function (username) {
+    console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
+    socket.username = username;
+    users[username] = username;
+    socket.room = rooms[1];
+    socket.join(socket.room);
+    MongoClient.connect(uri, function (err, db) {
+      db.collection('messages').find({}).sort({
         _id: 1
       }).limit(100).toArray(function (err, result) {
         if (err) throw err;
@@ -133,44 +133,45 @@ MongoClient.connect(uri, function (err, db) {
           socket.emit('updateChat', result[i].name, result[i].message);
         }
         socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
+        db.close();
       });
-
-      socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', username + ' has connected to this room');
-      io.sockets.in(socket.room).emit('updateUsersOnline', users);
     });
 
-    socket.on('sendMessage', function (message) {
-      // console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
+    socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', username + ' has connected to this room');
+    io.sockets.in(socket.room).emit('updateUsersOnline', users);
+  });
 
-      for (var key in icons) {
-        message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
-      }
-      message = replaceAll(message, 'proptit', genIcons('/images/logo.png'))
-      message = yahoo(message);
-      io.sockets.in(socket.room).emit('updateChat', socket.username, message);
-      collection.insert({
+  socket.on('sendMessage', function (message) {
+    // console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
+
+    for (var key in icons) {
+      message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
+    }
+    message = replaceAll(message, 'proptit', genIcons('/images/logo.png'))
+    message = yahoo(message);
+    io.sockets.in(socket.room).emit('updateChat', socket.username, message);
+    MongoClient.connect(uri, function (err, db) {
+      db.collection('messages').insertOne({
         name: socket.username,
-        content: message
+        message: message
       }, function (err, o) {
-        if (err) {
-          console.warn(err.message);
-        } else {
-          console.log("chat message inserted into db!");
-        }
+        if (err) throw err;
+        console.log("chat message inserted into db!");
+        db.close();
       });
-    });
-
-    socket.on('disconnect', function () {
-      socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' has disconnected');
-      console.log(socket.username + ' - room: ' + socket.room + ' - has disconnected!');
-      socket.leave(socket.room);
-      delete users[socket.username]
-      io.sockets.in(socket.room).emit('updateUsersOnline', users);
-
     });
   });
 
+  socket.on('disconnect', function () {
+    socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' has disconnected');
+    console.log(socket.username + ' - room: ' + socket.room + ' - has disconnected!');
+    socket.leave(socket.room);
+    delete users[socket.username]
+    io.sockets.in(socket.room).emit('updateUsersOnline', users);
+    // db.close();
+  });
 });
+
 
 
 function yahoo(message) {
