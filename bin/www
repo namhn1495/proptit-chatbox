@@ -137,6 +137,12 @@ io.sockets.on('connection', function (socket) {
 
 
   socket.on('newUser', function (username) {
+    var whitespacePattern = /^\s*$/;
+    var scripPattern = /<script[\s\S]*?>[\s\S]*?<\/script>/gi;
+    var temp = username.toLowerCase();
+    if ((/<[a-z][\s\S]*>/i.test(temp)) || whitespacePattern.test(temp) || scripPattern.test(temp)) {
+      username = 'Tên không hợp lệ';
+    }
     console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
     socket.username = username;
     users[username] = username;
@@ -146,7 +152,7 @@ io.sockets.on('connection', function (socket) {
       created: -1
     }).limit(100).exec(function (err, docs) {
       if (err) throw err;
-      for (var i = docs.length-1; i >= 0; i--) {
+      for (var i = docs.length - 1; i >= 0; i--) {
         console.log(docs[i].message);
         socket.emit('updateChat', docs[i].name, docs[i].message);
       }
@@ -160,7 +166,9 @@ io.sockets.on('connection', function (socket) {
   socket.on('sendMessage', function (message) {
     // console.log(socket.username + ' - ' + socket.room + ' - send: ' + message);
     var whitespacePattern = /^\s*$/;
-    if (!(/<[a-z][\s\S]*>/i.test(message)) && !whitespacePattern.test(message)) {
+    var scripPattern = /<script[\s\S]*?>[\s\S]*?<\/script>/gi;
+    var temp = message.toLowerCase();
+    if (!(/<[a-z][\s\S]*>/i.test(temp)) && !whitespacePattern.test(temp) && !scripPattern.test(temp)) {
       for (var key in icons) {
         message = replaceAll(message, '{' + key + '}', genIcons(icons[key]));
       }
@@ -176,6 +184,8 @@ io.sockets.on('connection', function (socket) {
         if (err) throw err;
         console.log('insert mess to db!');
       })
+    } else {
+      console.log('String không hợp lệ');
     }
   });
 
