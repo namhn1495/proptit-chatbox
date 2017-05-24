@@ -141,7 +141,10 @@ io.sockets.on('connection', function (socket) {
     var scripPattern = /<script[\s\S]*?>[\s\S]*?<\/script>/gi;
     var temp = username.toLowerCase();
     if ((/<[a-z][\s\S]*>/i.test(temp)) || whitespacePattern.test(temp) || scripPattern.test(temp)) {
-      username = 'Tên không hợp lệ';
+      username = 'Undefined';
+    }
+    if(username === undefined ){
+      username ='Undefined'
     }
     console.log('new client connected - username: ' + username + ' - id: ' + socket.id);
     socket.username = username;
@@ -153,7 +156,7 @@ io.sockets.on('connection', function (socket) {
     }).limit(100).exec(function (err, docs) {
       if (err) throw err;
       for (var i = docs.length - 1; i >= 0; i--) {
-        console.log(docs[i].message);
+        console.log(docs[i].username +" "+ docs[i].message);
         socket.emit('updateChat', docs[i].name, docs[i].message);
       }
       socket.emit('updateChat', 'SERVER', 'Welcome <span class="welcome">' + socket.username + '</span>!');
